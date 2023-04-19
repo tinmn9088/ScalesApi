@@ -5,7 +5,6 @@ namespace ScalesApi.Contracts;
 
 public record WeightData
 {
-    [JsonConverter(typeof(DoubleJsonConverter))]
     public double Weight { get; init; }
     public string Unit { get; init; }
     [JsonConverter(typeof(DateTimeJsonConverter))]
