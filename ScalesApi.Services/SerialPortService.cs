@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using NLog;
 using ScalesApi.Contracts;
 using System.IO.Ports;
 
@@ -8,6 +9,7 @@ public class SerialPortService : ISerialPortService
 {
     private readonly SerialPortServiceConfiguration _configuration;
     private readonly SerialPort _serialPort;
+    private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     public SerialPortService(IOptions<SerialPortServiceConfiguration> configuration) {
         _configuration = configuration.Value;
@@ -53,7 +55,16 @@ public class SerialPortService : ISerialPortService
         try
         {
             _serialPort.Open();
-            return _serialPort.ReadLine();
+
+            // Считывание неполноценной строки
+            string line = _serialPort.ReadLine().Trim();
+            _logger.Debug($"Read defective \"{line}\" from \"{_serialPort.PortName}\"");
+
+            // Считывание полноценной строки
+            line = _serialPort.ReadLine().Trim();
+            _logger.Debug($"Read \"{line}\" from \"{_serialPort.PortName}\"");
+
+            return line;
         }
         finally { _serialPort.Close(); }
     }
